@@ -160,7 +160,7 @@ app.post("/users", async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "User created successfully",
-      newUser
+      newUser,
     });
   } catch (err) {
     return res.status(500).json({
@@ -234,29 +234,36 @@ app.get("/users/:id", async (req, res) => {
  * 2. Route: '/users/:id'
  * 3. Description: Update particular user by id
  */
-app.patch("/users/:id", (req, res) => {
-  const { id } = req.params;
+app.patch("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  const { name, password, email } = req.body;
 
-  /**
-   * Approach-1: findIndex
-   * Copy previous content and then override on that content.
-   * Isse ye hoga ki agar request blank aaegi to data wahi rahega.
-   */
+  try {
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      name,
+      password,
+      email,
+    });
 
-  // let index = USERS.findIndex(user => user.id == id);
-  // USERS[index] = {...USERS[index], ...req.body}
-  // return res.json({ message: "User updated successfully!"});
+    if (!updatedUser) {
+      return res.status(200).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
-  /**
-   * Approach-2: Map()
-   * Agar user.id == id hai to update kr do, otherwise prev USERS
-   * ko hi return kr do
-   */
-  let updateUsers = USERS.map((user, index) =>
-    user.id == id ? { ...USERS[index], ...req.body } : user
-  );
-  USERS = [...updateUsers];
-  return res.json({ message: "User updated successfully!", updateUsers });
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully!",
+      user: updatedUser,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while updating the user",
+      error: err.message,
+    });
+  }
 });
 
 /**
@@ -265,7 +272,32 @@ app.patch("/users/:id", (req, res) => {
  * 2. Route: '/users/:id'
  * 3. Description: Delete particular user by id
  */
-app.delete("/users/:id", (req, res) => {});
+app.delete("/users/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(200).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully!",
+      user: deletedUser,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while deleting the user",
+      error: err.message,
+    });
+  }
+});
 
 app.listen(3000, () => {
   connectDB();
