@@ -23,6 +23,27 @@ async function connectDB() {
 }
 
 /**
+ * Designing Schema for Users:
+ */
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+  },
+  email: {
+    type: String,
+    unique: true,
+  },
+  password: {
+    type: String,
+  },
+});
+
+/**
+ * Creating Model for Users:
+ */
+const User = mongoose.model("User", userSchema);
+
+/**
  * Author
  * 1. Method: POST
  * 2. Route: '/blogs'
@@ -101,7 +122,7 @@ app.delete("/blogs/:id", (req, res) => {});
  * 2. Route: '/users'
  * 3. Description: Add User
  */
-app.post("/users", (req, res) => {
+app.post("/users", async (req, res) => {
   const { name, password, email } = req.body;
 
   try {
@@ -124,15 +145,26 @@ app.post("/users", (req, res) => {
       });
     }
 
-    USERS.push({ ...req.body, id: USERS.length + 1 });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const newUser = await User.create({ name, password, email });
+
     return res.status(200).json({
       success: true,
       message: "User created successfully",
+      newUser
     });
   } catch (err) {
     return res.status(500).json({
       success: false,
       message: "Please try again",
+      error: err.message,
     });
   }
 });
