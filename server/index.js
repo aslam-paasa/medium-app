@@ -177,19 +177,20 @@ app.post("/users", async (req, res) => {
  * 2. Route: '/users'
  * 3. Description: Retrieve all users
  */
-app.get("/users", (req, res) => {
+app.get("/users", async (req, res) => {
   try {
-    // DB Call
+    const users = await User.find();
 
     return res.status(200).json({
       success: true,
       message: "Users fetched successfully",
-      USERS,
+      users,
     });
   } catch (err) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: "Error occurred while fetching the users",
+      error: err.message,
     });
   }
 });
@@ -200,29 +201,29 @@ app.get("/users", (req, res) => {
  * 2. Route: '/users/:id'
  * 3. Description: Retrieve particular user by id
  */
-app.get("/users/:id", (req, res) => {
+app.get("/users/:id", async (req, res) => {
   try {
-    // DB Call
+    const id = req.params.id;
 
-    const userId = USERS.filter((user) => user.id == req.params.id);
+    const user = await User.findById(id);
 
-    if (userId.length == 0) {
+    if (!user) {
       return res.status(200).json({
         success: false,
         message: "User not found",
-        userId,
       });
     }
 
     return res.status(200).json({
       success: true,
       message: "Users fetched successfully",
-      userId,
+      user,
     });
   } catch (err) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: "Error occurred while fetching the users",
+      error: err.message,
     });
   }
 });
