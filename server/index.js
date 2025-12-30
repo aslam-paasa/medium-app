@@ -9,8 +9,8 @@ const blogRoutes = require("./routes/blog.routes");
 app.use(cors());
 app.use(express.json());
 
-app.use("/", userRoutes);
-app.use("/", blogRoutes);
+app.use("/api/v1", userRoutes);
+app.use("/api/v1", blogRoutes);
 
 app.listen(3000, () => {
   connectDB();
