@@ -29,7 +29,7 @@ const createBlog = async (req, res) => {
 
 const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ draft: false });
+    const blogs = await Blog.find();
     return res.status(200).json({
       success: true,
       message: "Blogs fetched successfully",

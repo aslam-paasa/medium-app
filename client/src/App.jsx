@@ -1,17 +1,19 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
-  /* 3. Accumulate User Data */
   const [userData, setUserData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  /* 4. Post User Data to Server */
+  const [blogs, setBlogs] = useState([]);
+
+
+  /* 1. Post User Data to the Server */ 
   const handleSubmit = async () => {
-    const data = await fetch("http://localhost:3000/users", {
+    const data = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
@@ -21,37 +23,66 @@ function App() {
     alert(response.message);
   };
 
+  /* 2. Fetch Blogs from the Server */
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      const data = await fetch("http://localhost:3000/api/v1/blogs");
+      const response = await data.json();
+      setBlogs(response.blogs);
+    };
+    fetchBlogs();
+  }, []);
+
+  console.log(blogs);
+
   return (
     <div>
       <h1>Sign Up</h1>
-      {/* 1. Writing User Data to the State */}
       <div>
         <input
           type="text"
           placeholder="Name"
-          value={userData.name}
-          onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+          onChange={(e) =>
+            setUserData((userData) => ({
+              ...userData,
+              name: e.target.value,
+            }))
+          }
         />
         <br /> <br />
         <input
           type="email"
           placeholder="Email"
-          value={userData.email}
-          onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+          onChange={(e) =>
+            setUserData((userData) => ({
+              ...userData,
+              email: e.target.value,
+            }))
+          }
         />
         <br /> <br />
         <input
-          type="password"
+          type="text"
           placeholder="Password"
-          value={userData.password}
           onChange={(e) =>
-            setUserData({ ...userData, password: e.target.value })
+            setUserData((userData) => ({
+              ...userData,
+              password: e.target.value,
+            }))
           }
         />
       </div>
-      {/* 2. Submitting User Data to the Server */}
       <br />
       <button onClick={handleSubmit}>Submit</button>
+
+      {blogs.map((blog) => (
+        <div key={blog._id}>
+          <ul>
+            <li>{blog.title}</li>
+            <p>{blog.description}</p>
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }
