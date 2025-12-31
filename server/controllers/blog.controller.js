@@ -1,8 +1,9 @@
 const Blog = require("../models/blog.models");
+const User = require("../models/user.models");
 
 const createBlog = async (req, res) => {
   try {
-    const { title, description, draft } = req.body;
+    const { title, description, draft, creator } = req.body;
 
     if (!title || !description) {
       return res.status(400).json({
@@ -11,7 +12,16 @@ const createBlog = async (req, res) => {
       });
     }
 
-    const blog = await Blog.create({ title, description, draft });
+    const user = await User.findById(creator);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const blog = await Blog.create({ title, description, draft, creator });
+    await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
 
     return res.status(200).json({
       success: true,
@@ -29,7 +39,10 @@ const createBlog = async (req, res) => {
 
 const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find();
+    const blogs = await Blog.find({ draft: false }).populate({
+      path: "creator",
+      select: "-password",
+    });
     return res.status(200).json({
       success: true,
       message: "Blogs fetched successfully",
@@ -48,7 +61,7 @@ const getBlogById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findById(id).populate("creator");
 
     if (!blog) {
       return res.status(404).json({
