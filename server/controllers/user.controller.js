@@ -1,4 +1,5 @@
 const User = require("../models/user.models");
+const bcrypt = require("bcrypt");
 
 const createUser = async (req, res) => {
   const { name, password, email } = req.body;
@@ -31,7 +32,12 @@ const createUser = async (req, res) => {
       });
     }
 
-    const newUser = await User.create({ name, password, email });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      name,
+      password: hashedPassword,
+      email,
+    });
 
     return res.status(200).json({
       success: true,
@@ -42,6 +48,51 @@ const createUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Please try again",
+      error: err.message,
+    });
+  }
+};
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter the email and password",
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (!isPasswordCorrect) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      existingUser,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while logging in the user",
       error: err.message,
     });
   }
@@ -153,6 +204,7 @@ const deleteUserById = async (req, res) => {
 
 module.exports = {
   createUser,
+  loginUser,
   getAllUsers,
   getUserById,
   updateUserById,

@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   createUser,
+  loginUser,
   getAllUsers,
   getUserById,
   updateUserById,
@@ -9,10 +10,11 @@ const {
 
 const userRoutes = express.Router();
 
-userRoutes.post("/users", createUser);
+userRoutes.post("/user", createUser);
+userRoutes.post("/user/login", loginUser);
 userRoutes.get("/users", getAllUsers);
-userRoutes.get("/users/:id", getUserById);
-userRoutes.patch("/users/:id", updateUserById);
-userRoutes.delete("/users/:id", deleteUserById);
+userRoutes.get("/user/:id", getUserById);
+userRoutes.patch("/user/:id", updateUserById);
+userRoutes.delete("/user/:id", deleteUserById);
 
 module.exports = userRoutes;
