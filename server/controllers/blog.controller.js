@@ -3,7 +3,8 @@ const User = require("../models/user.models");
 
 const createBlog = async (req, res) => {
   try {
-    const { title, description, draft, creator } = req.body;
+    const { title, description, draft } = req.body;
+    const creator = req.user.id; /* verifyJWT return req.user */
 
     if (!title || !description) {
       return res.status(400).json({
@@ -20,10 +21,18 @@ const createBlog = async (req, res) => {
       });
     }
 
-    const blog = await Blog.create({ title, description, draft, creator });
-    await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
+    const blog = await Blog.create({
+      title,
+      description,
+      draft,
+      creator,
+    });
 
-    return res.status(200).json({
+    await User.findByIdAndUpdate(creator, {
+      $push: { blogs: blog._id },
+    });
+
+    return res.status(201).json({
       success: true,
       message: "Blog created successfully",
       blog: blog,
@@ -61,7 +70,10 @@ const getBlogById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const blog = await Blog.findById(id).populate("creator");
+    const blog = await Blog.findById(id).populate({
+      path: "creator",
+      select: "-password",
+    });
 
     if (!blog) {
       return res.status(404).json({
@@ -87,11 +99,12 @@ const getBlogById = async (req, res) => {
 const updateBlogById = async (req, res) => {
   const { id } = req.params;
   const { title, description, draft } = req.body;
+
   try {
     const blog = await Blog.findByIdAndUpdate(
       id,
       { title, description, draft },
-      { new: true }
+      { new: true },
     );
 
     if (!blog) {
@@ -117,8 +130,21 @@ const updateBlogById = async (req, res) => {
 
 const deleteBlogById = async (req, res) => {
   const { id } = req.params;
+
   try {
     const blog = await Blog.findByIdAndDelete(id);
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    await User.findByIdAndUpdate(blog.creator, {
+      $pull: { blogs: blog._id },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Blog deleted successfully",

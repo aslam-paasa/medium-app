@@ -1,31 +1,20 @@
-const User = require("../models/user.models");
+const User = require("../models/user.models.js");
 const bcrypt = require("bcrypt");
-const generateJWTToken = require("../utils/generateToken");
+const { generateJWTToken } = require("../utils/generateToken.js");
 
 const createUser = async (req, res) => {
   const { name, password, email } = req.body;
 
   try {
-    if (!name) {
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please enter the name",
-      });
-    }
-    if (!password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter the password",
-      });
-    }
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter the email",
+        message: "Name, email and password are required",
       });
     }
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -41,19 +30,20 @@ const createUser = async (req, res) => {
     });
 
     const token = generateJWTToken({
-      email: newUser.email,
       id: newUser._id.toString(),
+      email: newUser.email,
     });
 
     return res.status(201).json({
       success: true,
       message: "User created successfully",
       user: {
+        id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         blogs: newUser.blogs,
+        token,
       },
-      token,
     });
   } catch (err) {
     return res.status(500).json({
@@ -85,7 +75,7 @@ const loginUser = async (req, res) => {
 
     const isPasswordCorrect = await bcrypt.compare(
       password,
-      existingUser.password
+      existingUser.password,
     );
 
     if (!isPasswordCorrect) {
