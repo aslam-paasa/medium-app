@@ -46,6 +46,54 @@ const createBlog = async (req, res) => {
   }
 };
 
+const updateBlogById = async (req, res) => {
+  try {
+    /* login user from auth token */
+    const creator = req.user.id; 
+    const { id } = req.params;
+    const { title, description, draft } = req.body;
+
+    /* Find Blog */
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    /* Auth check — sirf creator update kar sakta hai */
+    if (blog.creator.toString() !== creator) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized for this action",
+      });
+    }
+
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      id,
+      {
+        title: title || blog.title,
+        description: description || blog.description,
+        draft: draft ?? blog.draft,
+      },
+      { new: true },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog updated successfully",
+      blog: updatedBlog,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while updating the blog",
+      error: error.message,
+    });
+  }
+};
+
 const getAllBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find({ draft: false }).populate({
@@ -96,37 +144,6 @@ const getBlogById = async (req, res) => {
   }
 };
 
-const updateBlogById = async (req, res) => {
-  const { id } = req.params;
-  const { title, description, draft } = req.body;
-
-  try {
-    const blog = await Blog.findByIdAndUpdate(
-      id,
-      { title, description, draft },
-      { new: true },
-    );
-
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: "Blog not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Blog updated successfully",
-      blog: blog,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error occurred while updating the blog",
-      error: error.message,
-    });
-  }
-};
 
 const deleteBlogById = async (req, res) => {
   const { id } = req.params;
