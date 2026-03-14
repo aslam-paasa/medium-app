@@ -86,15 +86,20 @@ const loginUser = async (req, res) => {
     }
 
     const token = generateJWTToken({
-      email: existingUser.email,
       id: existingUser._id.toString(),
+      email: existingUser.email,
     });
 
     return res.status(200).json({
       success: true,
       message: "User logged in successfully",
-      user: existingUser,
-      token,
+      user: {
+        id: existingUser._id,
+        name: existingUser.name,
+        email: existingUser.email,
+        blogs: existingUser.blogs,
+        token,
+      },
     });
   } catch (err) {
     return res.status(500).json({

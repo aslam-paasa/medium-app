@@ -48,8 +48,8 @@ const createBlog = async (req, res) => {
 
 const updateBlogById = async (req, res) => {
   try {
-    /* login user from auth token */
-    const creator = req.user.id; 
+    /* login user from auth token & update data */
+    const creator = req.user.id;
     const { id } = req.params;
     const { title, description, draft } = req.body;
 
@@ -89,6 +89,52 @@ const updateBlogById = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error occurred while updating the blog",
+      error: error.message,
+    });
+  }
+};
+
+const deleteBlogById = async (req, res) => {
+  try {
+    /* Get blog id + logged-in user id */
+    const { id } = req.params;
+    const creator = req.user.id;
+
+    /* Find blog */
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    /* Check ownership */
+    if (blog.creator.toString() !== creator) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this blog",
+      });
+    }
+
+    /* Delete blog */
+    await Blog.findByIdAndDelete(id);
+
+    /* Remove blog reference from user */
+    await User.findByIdAndUpdate(blog.creator, {
+      $pull: { blogs: blog._id },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog deleted successfully",
+      blog,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while deleting the blog",
       error: error.message,
     });
   }
@@ -139,38 +185,6 @@ const getBlogById = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error occurred while fetching the blog",
-      error: error.message,
-    });
-  }
-};
-
-
-const deleteBlogById = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const blog = await Blog.findByIdAndDelete(id);
-
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: "Blog not found",
-      });
-    }
-
-    await User.findByIdAndUpdate(blog.creator, {
-      $pull: { blogs: blog._id },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Blog deleted successfully",
-      blog: blog,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error occurred while deleting the blog",
       error: error.message,
     });
   }

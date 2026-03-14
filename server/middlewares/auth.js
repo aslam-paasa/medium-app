@@ -47,8 +47,6 @@ async function verifyUser(req, res, next) {
     /* 6. Move to next middleware/Controller */
     next();
   } catch (err) {
-    console.error("Token verification error:", err);
-
     return res.status(500).json({
       success: false,
       message: "Authentication failed",

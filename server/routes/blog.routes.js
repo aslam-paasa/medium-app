@@ -14,6 +14,6 @@ blogRoutes.post("/blog", verifyUser, createBlog);
 blogRoutes.get("/blogs", getAllBlogs);
 blogRoutes.get("/blog/:id", getBlogById);
 blogRoutes.patch("/blog/:id", verifyUser, updateBlogById);
-blogRoutes.delete("/blog/:id", deleteBlogById);
+blogRoutes.delete("/blog/:id", verifyUser, deleteBlogById);
 
 module.exports = blogRoutes;
