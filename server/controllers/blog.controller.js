@@ -140,11 +140,55 @@ const deleteBlogById = async (req, res) => {
   }
 };
 
+const likeBlogById = async (req, res) => {
+  try {
+    /* Get blog id + logged-in user id */
+    const { id } = req.params;
+    const creator = req.user.id;
+
+    /* Find blog */
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    /* Check if already liked */
+    if (!blog.likes.includes(creator)) {
+      await Blog.findByIdAndUpdate(id, { $push: { likes: creator } });
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog liked successfully",
+      });
+    } else {
+      await Blog.findByIdAndUpdate(id, { $pull: { likes: creator } });
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog disliked successfully",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while liking the blog",
+      error: error.message,
+    });
+  }
+};
+
 const getAllBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find({ draft: false }).populate({
       path: "creator",
       select: "-password",
+    }).populate({
+      path: "likes",
+      select: "email name"
     });
     return res.status(200).json({
       success: true,
@@ -196,4 +240,5 @@ module.exports = {
   getBlogById,
   updateBlogById,
   deleteBlogById,
+  likeBlogById,
 };

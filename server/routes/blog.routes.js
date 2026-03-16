@@ -5,6 +5,7 @@ const {
   getBlogById,
   updateBlogById,
   deleteBlogById,
+  likeBlogById
 } = require("../controllers/blog.controller");
 const verifyUser = require("../middlewares/auth");
 
@@ -15,5 +16,7 @@ blogRoutes.get("/blogs", getAllBlogs);
 blogRoutes.get("/blog/:id", getBlogById);
 blogRoutes.patch("/blog/:id", verifyUser, updateBlogById);
 blogRoutes.delete("/blog/:id", verifyUser, deleteBlogById);
+blogRoutes.post("/blog/like/:id", verifyUser, likeBlogById);
+
 
 module.exports = blogRoutes;
