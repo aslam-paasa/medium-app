@@ -183,13 +183,15 @@ const likeBlogById = async (req, res) => {
 
 const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ draft: false }).populate({
-      path: "creator",
-      select: "-password",
-    }).populate({
-      path: "likes",
-      select: "email name"
-    });
+    const blogs = await Blog.find({ draft: false })
+      .populate({
+        path: "creator",
+        select: "-password",
+      })
+      .populate({
+        path: "likes",
+        select: "email name",
+      });
     return res.status(200).json({
       success: true,
       message: "Blogs fetched successfully",
@@ -209,8 +211,11 @@ const getBlogById = async (req, res) => {
 
   try {
     const blog = await Blog.findById(id).populate({
-      path: "creator",
-      select: "-password",
+      path: "comments",
+      populate: {
+        path: "user",
+        select: "name email",
+      },
     });
 
     if (!blog) {
@@ -240,5 +245,5 @@ module.exports = {
   getBlogById,
   updateBlogById,
   deleteBlogById,
-  likeBlogById,
+  likeBlogById
 };
