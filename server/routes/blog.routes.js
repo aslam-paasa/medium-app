@@ -14,11 +14,12 @@ const {
   likeComment,
 } = require("../controllers/comment.controller");
 const verifyUser = require("../middlewares/auth");
+const upload = require("../utils/multer");
 
 const blogRoutes = express.Router();
 
 /* 1. Blog APIs */
-blogRoutes.post("/blog", verifyUser, createBlog);
+blogRoutes.post("/blog", verifyUser, upload.single("image"), createBlog);
 blogRoutes.get("/blogs", getAllBlogs);
 blogRoutes.get("/blog/:id", getBlogById);
 blogRoutes.patch("/blog/:id", verifyUser, updateBlogById);

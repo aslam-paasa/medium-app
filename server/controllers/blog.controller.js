@@ -1,9 +1,11 @@
 const Blog = require("../models/blog.models");
 const User = require("../models/user.models");
+const uploadImage = require("../utils/uploadImage");
 
 const createBlog = async (req, res) => {
   try {
     const { title, description, draft } = req.body;
+    const file = req.file;
     const creator = req.user.id; /* verifyJWT return req.user */
 
     if (!title || !description) {
@@ -13,6 +15,13 @@ const createBlog = async (req, res) => {
       });
     }
 
+    if (!file) {
+      return res.status(400).json({
+        message: "Image is required",
+      });
+    }
+
+    /* Check user */
     const user = await User.findById(creator);
     if (!user) {
       return res.status(404).json({
@@ -21,13 +30,20 @@ const createBlog = async (req, res) => {
       });
     }
 
+    /* Upload image */
+    const { secure_url, public_id } = await uploadImage(file.buffer);
+
+    /* Create blog */
     const blog = await Blog.create({
       title,
       description,
       draft,
       creator,
+      image: secure_url,
+      imageId: public_id,
     });
 
+    /* Push blog into user */
     await User.findByIdAndUpdate(creator, {
       $push: { blogs: blog._id },
     });
@@ -245,5 +261,5 @@ module.exports = {
   getBlogById,
   updateBlogById,
   deleteBlogById,
-  likeBlogById
+  likeBlogById,
 };
