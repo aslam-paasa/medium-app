@@ -7,71 +7,61 @@ const Signup = () => {
     password: "",
   });
 
-  /* 1. Post User Data to the Server */
-  /* Send signup request to backend */
-  const handleSubmit = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/api/v1/user", {
+      const data = await fetch("http://localhost:3000/api/v1/signup", {
         method: "POST",
+        body: JSON.stringify(userData),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
       });
-
-      const res = await response.json();
-
-      if (response.ok && res.success) {
-        localStorage.setItem("user", JSON.stringify(res.user));
-        alert(res.message);
-      } else {
-        alert(res.message || "Signup failed");
-      }
-    } catch (err) {
-      console.error("Signup error:", err);
-      alert("Something went wrong");
+      const res = await data.json();
+      console.log(res);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <div>
+    <div className="w-[20%] flex flex-col items-center gap-5">
+      <h1 className="text-3xl">Sign Up</h1>
+
+      <form
+        onSubmit={handleRegister}
+        className="w-[100%] flex flex-col items-center gap-5"
+      >
         <input
           type="text"
-          placeholder="Name"
           onChange={(e) =>
-            setUserData((userData) => ({
-              ...userData,
-              name: e.target.value,
-            }))
+            setUserData((prev) => ({ ...prev, name: e.target.value }))
           }
+          className="w-full h-[50px] p-2 bg-gray-500 text-white text-xl rounded-md focus:outline-none placeholder:text-gray-400"
+          placeholder="enter your name"
         />
-        <br /> <br />
         <input
           type="email"
-          placeholder="Email"
+          autoComplete="email"
           onChange={(e) =>
-            setUserData((userData) => ({
-              ...userData,
-              email: e.target.value,
-            }))
+            setUserData((prev) => ({ ...prev, email: e.target.value }))
           }
+          className="w-full h-[50px] p-2 bg-gray-500 text-white text-xl rounded-md focus:outline-none placeholder:text-gray-400"
+          placeholder="enter your email"
         />
-        <br /> <br />
         <input
-          type="text"
-          placeholder="Password"
+          type="password"
+          autoComplete="password"
           onChange={(e) =>
-            setUserData((userData) => ({
-              ...userData,
-              password: e.target.value,
-            }))
+            setUserData((prev) => ({ ...prev, password: e.target.value }))
           }
+          className="w-full h-[50px] p-2 bg-gray-500 text-white text-xl rounded-md focus:outline-none placeholder:text-gray-400"
+          placeholder="enter your password"
         />
-      </div>
-      <br />
-      <button onClick={handleSubmit}>Submit</button>
+        <button className="w-[100px] h-[50px] p-2 bg-gray-500 text-white text-xl rounded-md focus:outline-none">
+          Register
+        </button>
+      </form>
     </div>
   );
 };
