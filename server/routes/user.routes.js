@@ -10,8 +10,8 @@ const {
 
 const userRoutes = express.Router();
 
-userRoutes.post("/user", createUser);
-userRoutes.post("/user/login", loginUser);
+userRoutes.post("/signup", createUser);
+userRoutes.post("/signin", loginUser);
 userRoutes.get("/users", getAllUsers);
 userRoutes.get("/user/:id", getUserById);
 userRoutes.patch("/user/:id", updateUserById);

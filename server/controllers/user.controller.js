@@ -98,8 +98,8 @@ const loginUser = async (req, res) => {
         name: existingUser.name,
         email: existingUser.email,
         blogs: existingUser.blogs,
-        token,
       },
+      token
     });
   } catch (err) {
     return res.status(500).json({
