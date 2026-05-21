@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 const AuthForm = ({ type }) => {
     const [userData, setUserData] = useState({
