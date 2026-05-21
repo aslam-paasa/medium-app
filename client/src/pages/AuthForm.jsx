@@ -22,9 +22,6 @@ const AuthForm = ({ type }) => {
             localStorage.setItem("user", JSON.stringify(res.data.user));
             localStorage.setItem("token", JSON.stringify(res.data.token));
 
-            console.log(localStorage.getItem("user"));
-            console.log(localStorage.getItem("token"));
-
             toast.success(res.data.message);
         } catch (error) {
             toast.error(error.response.data.message);
