@@ -30,7 +30,7 @@ const AuthForm = ({ type }) => {
     };
 
     return (
-        <div className="w-[20%] flex flex-col items-center gap-5">
+        <div className="w-[20%] flex flex-col items-center gap-5 mt-32">
             <h1 className="text-3xl">{type === "signin" ? "Sign In" : "Sign Up"}</h1>
 
             <form
