@@ -1,3 +1,4 @@
+const ShortUniqueId = require("short-unique-id");
 const Blog = require("../models/blog.models");
 const User = require("../models/user.models");
 const uploadImage = require("../utils/uploadImage");
@@ -33,6 +34,10 @@ const createBlog = async (req, res) => {
     /* Upload image */
     const { secure_url, public_id } = await uploadImage(file.buffer);
 
+    /* Custom BlogId */
+    const { randomUUID } = new ShortUniqueId({ length: 10 });
+    const blogId = title.toLowerCase().split(" ").join("-") + "-" + randomUUID()
+
     /* Create blog */
     const blog = await Blog.create({
       title,
@@ -41,6 +46,7 @@ const createBlog = async (req, res) => {
       creator,
       image: secure_url,
       imageId: public_id,
+      blogId
     });
 
     /* Push blog into user */
@@ -223,16 +229,20 @@ const getAllBlogs = async (req, res) => {
 };
 
 const getBlogById = async (req, res) => {
-  const { id } = req.params;
+  const { blogId } = req.params;
 
   try {
-    const blog = await Blog.findById(id).populate({
-      path: "comments",
-      populate: {
-        path: "user",
-        select: "name email",
-      },
-    });
+    const blog = await Blog.findOne({ blogId })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
+      }).populate({
+        path: "creator",
+        select: "name email"
+      });
 
     if (!blog) {
       return res.status(404).json({

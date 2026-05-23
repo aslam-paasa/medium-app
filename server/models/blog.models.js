@@ -15,6 +15,11 @@ const blogSchema = new mongoose.Schema(
         type: String,
         required: true,
     },
+    blogId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     imageId: {
         type: String,
         required: true,

@@ -4,6 +4,7 @@ import AuthForm from "./pages/AuthForm";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 import AddBlog from "./pages/AddBlog";
+import BlogPage from "./pages/BlogPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/signup" element={<AuthForm type={"signup"} />} />
           <Route path="/signin" element={<AuthForm type={"signin"} />} />
           <Route path="/add-blog" element={<AddBlog />} />
+          <Route path="/blog/:id" element={<BlogPage />} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Route>
       </Routes>
