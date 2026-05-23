@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import AuthForm from "./pages/AuthForm";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
+import AddBlog from "./pages/AddBlog";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<AuthForm type={"signup"} />} />
           <Route path="/signin" element={<AuthForm type={"signin"} />} />
+          <Route path="/add-blog" element={<AddBlog />} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Route>
       </Routes>

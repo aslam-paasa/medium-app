@@ -20,7 +20,7 @@ const AuthForm = ({ type }) => {
             );
 
             localStorage.setItem("user", JSON.stringify(res.data.user));
-            localStorage.setItem("token", JSON.stringify(res.data.token));
+            localStorage.setItem("token", res.data.token);
 
             toast.success(res.data.message);
         } catch (error) {
