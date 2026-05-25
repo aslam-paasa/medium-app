@@ -8,7 +8,7 @@ const HomePage = () => {
     async function fetchBlogs() {
         try {
             const res = await axios.get(
-                "http://localhost:3000/api/v1/blogs"
+                `${import.meta.env.VITE_BACKEND_URL}/blogs`
             );
 
             setBlogs(res.data.blogs);

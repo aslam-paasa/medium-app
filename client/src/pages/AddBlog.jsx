@@ -16,7 +16,7 @@ const AddBlog = () => {
     async function handlePostBlog() {
         try {
             const res = await axios.post(
-                `http://localhost:3000/api/v1/blog`,
+                `${import.meta.env.VITE_BACKEND_URL}/blog`,
                 blogData,
                 {
                     headers: {

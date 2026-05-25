@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 /**
  * Connecting Backend with Database MongoDB:
  */
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://admin:admin123@cluster0.goyedz2.mongodb.net/blogDatabase"
-    );
+    await mongoose.connect(process.env.DB_URI);
     console.log("DB connection established");
   } catch (err) {
     console.log("Error connecting", err);

@@ -9,7 +9,7 @@ const BlogPage = () => {
 
     async function fetchBlogById() {
         try {
-            let res = await axios.get(`http://localhost:3000/api/v1/blog/${id}`)
+            let res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blog/${id}`)
             setBlogData(res.data.blog)
         } catch (error) {
             toast.error(error)
